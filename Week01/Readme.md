@@ -8,8 +8,6 @@
 | `atoi` | `<stdlib.h>` | Chuyển chuỗi thành số nguyên (Array to Integer). |
 | `fgets` | `<stdio.h>` | Đọc một dòng văn bản từ bàn phím an toàn hơn `gets`. |
 
-Dưới đây là các nhóm hàm được trình bày dưới dạng bảng Markdown:
-
 ## 1. Nhóm Quản lý Dữ liệu (Core Logic)
 
 | Hàm | Cú pháp | Mục đích | Giải thích |
