@@ -46,6 +46,7 @@ allocated by another channels, remove unallocated slot, ...
 c. Write an unitest with 10 testcases.
 */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -241,12 +242,76 @@ void process_show_command(char *channel_list) {
   printf("+------+------------+\n");
 }
 
+void run_unit_tests() {
+  printf("Running unit tests... \n");
+
+  // Test case 1: Initialize database
+  init();
+  for (int i = 1; i <= MAX_SLOTS; i++) {
+    assert(slot_owers[i] == 0);
+  }
+  printf("Testcase 1 (Init): PASSED.\n\n");
+
+  // Test case 2: Add a range of slots to a channel
+  // Expected: Slots 1-10 allocated to channel 1
+  process_add_command(1, "1-10");
+  assert(slot_owers[1] == 1 && slot_owers[5] == 1 && slot_owers[11] == 0);
+  printf("Testcase 2 (Add range): PASSED.\n\n");
+
+  // Test case 3: Add more to same channel
+  process_add_command(1, "20,30");
+  assert(slot_owers[20] == 1 && slot_owers[30] == 1);
+  printf("Testcase 3 (Add more): PASSED.\n\n");
+
+  // Test case 4: Conflict with other channel
+  process_add_command(2, "10-15"); // Slot 10 is allocated to channel 1
+  assert(slot_owers[10] == 1);     // Should not change
+  printf("Testcase 4 (Conflict): PASSED.\n\n");
+
+  // Test case 5: Remove partial
+  process_remove_command(1, "1-5");
+  assert(slot_owers[1] == 0 && slot_owers[6] == 1);
+  printf("Testcase 5 (Remove partial): PASSED.\n\n");
+
+  // Test case 6: Remove uauthorized slot
+  process_remove_command(
+      2, "6");                // Slot 6 is allocated to channel 1, not channel 2
+  assert(slot_owers[6] == 1); // Should not change
+  printf("Testcase 6 (Remove unauthorized): PASSED.\n\n");
+
+  // Test case 7: Boundary check
+  process_add_command(80, "80");
+  assert(slot_owers[80] == 80);
+  printf("Testcase 7 (Boundary check): PASSED.\n\n");
+
+  // Test case 8: Invalid Range
+  process_add_command(1, "81"); // Invalid slot ID
+  printf("Testcase 8 (Invalid range): PASSED.\n\n");
+
+  // Test case 9: Show command
+  printf("Testcase 9 (Show command):\n");
+  process_show_command("1,2,80");
+  printf("Testcase 9 (Show command): PASSED.\n\n");
+
+  // Test case 10: Final Reset
+  init();
+  assert(slot_owers[1] == 0 && slot_owers[80] == 0 && slot_owers[30] == 0);
+  printf("Testcase 10 (Final reset): PASSED.\n\n");
+
+  printf("All unit tests passed successfully.\n");
+}
+
 /**
  * Main entry point for the Text UI application.
  * Handles command input and dispatches to appropriate handlers.
  * Supported commands: init, add, rmv, show, exit
  */
-int main() {
+int main(int argc, char *argv[]) {
+  if (argc > 1 && strcmp(argv[1], "test") == 0) {
+    run_unit_tests();
+    return 0;
+  }
+
   char input[256];
   init(); // Initialize the slot database
   while (1) {

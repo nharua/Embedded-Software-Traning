@@ -10,6 +10,9 @@ $(TARGET): $(SRCS)
 clean:
 	rm -f $(TARGET)
 
+test: all
+	./$(TARGET) test
+
 run: all
 	./$(TARGET)
 
