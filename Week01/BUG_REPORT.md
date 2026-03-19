@@ -1,9 +1,9 @@
 # Bug Report - Channel Management System (Week 01)
 
 ## Summary of Feedback
-**Mentor:** Ms. Hien
-**Status:** In Progress
-**Priority:** High (Blocking release)
+- **Mentor:** Mr. Hien
+- **Status:** In Progress
+- **Priority:** High (Blocking release)
 
 ---
 
