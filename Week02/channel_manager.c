@@ -36,18 +36,17 @@ void update_hw_metadata(int channel_id) {
   // Update the metadata bists for the first and last slots
   // First slot: Set bit 16 to 1, Last slot: Set bit 17 to 1
   for (int i = first_slot_idx; i <= last_slot_idx; i++) {
-    uint16_t current_channel_id =
-        (uint16_t)(reg_read(i) & 0xFFFF); // Extract channel ID (bits 0-15)
-    if (current_channel_id == (uint16_t)channel_id) {
-      reg_write(i, 0, BIT_FIRST_SLOT, BIT_LAST_SLOT); // reset bit 16, 17 to 0
+    uint32_t current_value = reg_read(i);
+    if ((current_value & 0xFFFF) == (uint16_t)channel_id) {
+      uint32_t meta_value = 0;
       if (i == first_slot_idx) {
-        reg_write(i, 1, BIT_FIRST_SLOT,
-                  BIT_FIRST_SLOT); // Set bit 16 for the first slot
+        meta_value |= (1 << 0); // Set bit 16 for the first slot
       }
       if (i == last_slot_idx) {
-        reg_write(i, 1, BIT_LAST_SLOT,
-                  BIT_LAST_SLOT); // Set bit 17 for the last slot
+        meta_value |= (1 << 1); // Set bit 17 for the last slot
       }
+      reg_write(i, meta_value, BIT_FIRST_SLOT,
+                BIT_LAST_SLOT); // Update metadata bits for this slot
     }
   }
 }
@@ -302,6 +301,35 @@ void process_show_command(char *channel_list) {
       strcmp(channel_list, "all") == 0) {
     // Show all channels
     show_status();
+    return;
+  }
+
+  if (strncmp(channel_list, "rdwr", 4) == 0) {
+    int handled = 0;
+    // check rd status
+    if (strstr(channel_list, "en rd")) {
+      enable_log_rd = 1;
+      printf("Debug read logging enabled.\n");
+      handled = 1;
+    } else if (strstr(channel_list, "dis rd")) {
+      enable_log_rd = 0;
+      printf("Debug read logging disabled.\n");
+      handled = 1;
+    }
+    // check wr rd_status
+    if (strstr(channel_list, "en wr")) {
+      enable_log_wr = 1;
+      printf("Debug write logging enabled.\n");
+      handled = 1;
+    } else if (strstr(channel_list, "dis wr")) {
+      enable_log_wr = 0;
+      printf("Debug write logging disabled.\n");
+      handled = 1;
+    }
+
+    if (!handled) {
+      printf("Format: show rdwr <en/dis> rd <en/dis> wr\n");
+    }
     return;
   }
 

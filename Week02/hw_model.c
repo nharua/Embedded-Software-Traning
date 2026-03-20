@@ -16,8 +16,10 @@ void hw_init(void) {
     // Clear bits 0-15 and set to EMPTY_SLOT_VAL
     registers[i] = (registers[i] & ~mask) | ((EMPTY_SLOT_VAL << 0) & mask);
   }
-  printf("Sytem initialized. All registers set to EMPTY_SLOT_VAL (0x%X).\n",
-         EMPTY_SLOT_VAL);
+  if (enable_log_wr) {
+    printf("Sytem initialized. All registers set to EMPTY_SLOT_VAL (0x%X).\n",
+           EMPTY_SLOT_VAL);
+  }
 }
 
 void reg_write(int reg_idx, uint32_t value, int start_bit, int end_bit) {

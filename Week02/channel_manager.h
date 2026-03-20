@@ -15,5 +15,6 @@ void process_remove_command(int channel_id, char *slot_list);
 void process_show_command(char *channel_list);
 void get_channel_slots_str(int channel_id, char *buffer);
 void show_status();
+void handle_debug_cmd(char *rd_status, char *wr_status);
 
 #endif
