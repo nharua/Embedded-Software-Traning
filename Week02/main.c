@@ -6,6 +6,16 @@
 #include <string.h>
 
 /**
+ * TODO:
+ * 1. Improve show command, should be strictly "show <channel_id_list>" and
+support "show all".
+ * 2. 10 unit tests for channel_manager.c, covering add, remove, show, and edge
+cases.
+*/
+
+// ------------------------------------------------
+
+/**
  * main:
  * Entry point for the slot management program. Handles user commands for slot
  * allocation, removal, and status display.
@@ -55,7 +65,6 @@ int main() {
         uint32_t value = reg_read(reg_idx);
         if (value == 0) {
           printf("Reg[%d] is empty (0x%08X)\n", reg_idx, value);
-          continue;
         }
         printf("Reg[%d] = 0x%08X\n", reg_idx, value);
         if (strstr(cmd, "pretty") != NULL) {
@@ -68,26 +77,6 @@ int main() {
     }
 
     execute_from_table(cmd);
-
-    // if (strncmp(cmd, "add ", 4) == 0) {
-    //   int channel_id;
-    //   char slot_list[100];
-    //   if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
-    //     process_add_command(channel_id, slot_list);
-    //   } else {
-    //     printf("Format: add <channel_id> <slot_list>\n");
-    //   }
-    // }
-    //
-    // if (strncmp(cmd, "rmv ", 4) == 0) {
-    //   int channel_id;
-    //   char slot_list[100];
-    //   if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
-    //     process_remove_command(channel_id, slot_list);
-    //   } else {
-    //     printf("Format: rmv <channel_id> <slot_list>\n");
-    //   }
-    // }
   }
   return 0;
 }
