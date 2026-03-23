@@ -297,12 +297,16 @@ void get_channel_slots_str(int channel_id, char *buffer) {
  * @param channel_list Comma-separated list of channel IDs or "all".
  */
 void process_show_command(char *channel_list) {
-  if (channel_list == NULL || strlen(channel_list) == 0 ||
-      strcmp(channel_list, "all") == 0) {
+  if (channel_list == NULL || strlen(channel_list) == 0) {
+    printf("Format: show <channelList> | all | rdwr <en/dis> rd <en/dis> wr\n");
+    return;
+  }
+  if (strcmp(channel_list, "all") == 0) {
     // Show all channels
     show_status();
     return;
   }
+
 
   if (strncmp(channel_list, "rdwr", 4) == 0) {
     int handled = 0;
@@ -337,6 +341,7 @@ void process_show_command(char *channel_list) {
       slot_info[MAX_CHANNELS][SLOT_INFO_BUF_SIZE];
   int channels_to_show[MAX_CHANNELS], count = 0;
   int max_width = 10;
+  int parse_error = 0;
 
   // 1: Parse list
   strncpy(temp_list, channel_list, SLOT_LIST_BUF_SIZE - 1);
@@ -344,23 +349,50 @@ void process_show_command(char *channel_list) {
   char *token = strtok(temp_list, ",");
   while (token != NULL && count < MAX_CHANNELS) {
     int s, e;
-    if (sscanf(token, "%d-%d", &s, &e) == 2) {
+    char extra;
+    int match_range = sscanf(token, " %d - %d %c", &s, &e, &extra);
+    if (match_range >= 2) {
+      if (match_range == 3) {
+        printf("Error: Invalid argument format '%s'\n", token);
+        parse_error = 1;
+        break;
+      }
+      if (s < 1 || s > MAX_CHANNELS || e < 1 || e > MAX_CHANNELS || s > e) {
+        printf("Error: Invalid channel range %d-%d\n", s, e);
+        parse_error = 1;
+        break;
+      }
       for (int c = s; c <= e && count < MAX_CHANNELS; c++)
         channels_to_show[count++] = c;
     } else {
-      channels_to_show[count++] = atoi(token);
+      int ch;
+      int match_single = sscanf(token, " %d %c", &ch, &extra);
+      if (match_single == 1) {
+        if (ch < 1 || ch > MAX_CHANNELS) {
+          printf("Error: Invalid channel ID %d. Must be between 1 and %d.\n", ch, MAX_CHANNELS);
+          parse_error = 1;
+          break;
+        }
+        channels_to_show[count++] = ch;
+      } else {
+        printf("Error: Invalid argument '%s'\n", token);
+        parse_error = 1;
+        break;
+      }
     }
     token = strtok(NULL, ",");
   }
 
+  if (parse_error) {
+    return;
+  }
+
   // 2: Get slot info and calculate max width
   for (int i = 0; i < count; i++) {
-    if (channels_to_show[i] >= 1 && channels_to_show[i] <= MAX_CHANNELS) {
-      get_channel_slots_str(channels_to_show[i], slot_info[i]);
-      int len = strlen(slot_info[i]);
-      if (len > max_width)
-        max_width = len;
-    }
+    get_channel_slots_str(channels_to_show[i], slot_info[i]);
+    int len = strlen(slot_info[i]);
+    if (len > max_width)
+      max_width = len;
   }
 
   // 3: Print table header
@@ -379,9 +411,7 @@ void process_show_command(char *channel_list) {
 
   for (int i = 0; i < count; i++) {
     int ch = channels_to_show[i];
-    if (ch >= 1 && ch <= MAX_CHANNELS) {
-      printf("|%-6d| %-*s |\n", ch, max_width, slot_info[i]);
-    }
+    printf("|%-6d| %-*s |\n", ch, max_width, slot_info[i]);
   }
 
   printf("+------+--");

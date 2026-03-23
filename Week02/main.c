@@ -7,9 +7,7 @@
 
 /**
  * TODO:
- * 1. Improve show command, should be strictly "show <channel_id_list>" and
-support "show all".
- * 2. 10 unit tests for channel_manager.c, covering add, remove, show, and edge
+ * 1. 10 unit tests for channel_manager.c, covering add, remove, show, and edge
 cases.
 */
 
@@ -37,42 +35,6 @@ int main() {
     }
     if (strcmp(cmd, "init") == 0) {
       hw_init();
-      continue;
-    }
-    if (strncmp(cmd, "show", 4) == 0) {
-      char *param = cmd + 4;
-      while (*param == ' ')
-        param++; // Skip leading spaces
-      process_show_command(param);
-      continue;
-    }
-
-    if (strncmp(cmd, "wr ", 3) == 0) {
-      int reg_idx, start_bit, end_bit;
-      uint32_t value;
-      if (sscanf(cmd + 3, "%i %i cbit%d_%d", &reg_idx, &value, &start_bit,
-                 &end_bit) == 4) {
-        reg_write(reg_idx, value, start_bit, end_bit);
-      } else {
-        printf("Format: wr <reg> <value> cbit<n>_<m>\n");
-      }
-      continue;
-    }
-
-    if (strncmp(cmd, "rd ", 3) == 0) {
-      int reg_idx;
-      if (sscanf(cmd + 3, "%i", &reg_idx) == 1) {
-        uint32_t value = reg_read(reg_idx);
-        if (value == 0) {
-          printf("Reg[%d] is empty (0x%08X)\n", reg_idx, value);
-        }
-        printf("Reg[%d] = 0x%08X\n", reg_idx, value);
-        if (strstr(cmd, "pretty") != NULL) {
-          print_binary(value);
-        }
-      } else {
-        printf("Format: rd <reg> <pretty>\n");
-      }
       continue;
     }
 

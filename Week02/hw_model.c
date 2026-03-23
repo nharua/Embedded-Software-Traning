@@ -28,7 +28,12 @@ void reg_write(int reg_idx, uint32_t value, int start_bit, int end_bit) {
     return;
   }
   // Create a mask for the specified bit range
-  uint32_t mask = ((1U << (end_bit - start_bit + 1)) - 1) << start_bit;
+  uint32_t mask;
+  if (end_bit - start_bit == 31) {
+    mask = 0xFFFFFFFF;
+  } else {
+    mask = ((1U << (end_bit - start_bit + 1)) - 1) << start_bit;
+  }
   uint32_t old_value = registers[reg_idx];
   uint32_t new_value = (old_value & ~mask) | ((value << start_bit) & mask);
   registers[reg_idx] = new_value;
