@@ -1,4 +1,5 @@
 #include "channel_manager.h"
+#include "command_parser.h"
 #include "hw_model.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -28,32 +29,12 @@ int main() {
       hw_init();
       continue;
     }
-
-    if (strncmp(cmd, "add ", 4) == 0) {
-      int channel_id;
-      char slot_list[100];
-      if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
-        process_add_command(channel_id, slot_list);
-      } else {
-        printf("Format: add <channel_id> <slot_list>\n");
-      }
-    }
-
-    if (strncmp(cmd, "rmv ", 4) == 0) {
-      int channel_id;
-      char slot_list[100];
-      if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
-        process_remove_command(channel_id, slot_list);
-      } else {
-        printf("Format: rmv <channel_id> <slot_list>\n");
-      }
-    }
-
     if (strncmp(cmd, "show", 4) == 0) {
       char *param = cmd + 4;
       while (*param == ' ')
         param++; // Skip leading spaces
       process_show_command(param);
+      continue;
     }
 
     if (strncmp(cmd, "wr ", 3) == 0) {
@@ -65,6 +46,7 @@ int main() {
       } else {
         printf("Format: wr <reg> <value> cbit<n>_<m>\n");
       }
+      continue;
     }
 
     if (strncmp(cmd, "rd ", 3) == 0) {
@@ -82,7 +64,30 @@ int main() {
       } else {
         printf("Format: rd <reg> <pretty>\n");
       }
+      continue;
     }
+
+    execute_from_table(cmd);
+
+    // if (strncmp(cmd, "add ", 4) == 0) {
+    //   int channel_id;
+    //   char slot_list[100];
+    //   if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
+    //     process_add_command(channel_id, slot_list);
+    //   } else {
+    //     printf("Format: add <channel_id> <slot_list>\n");
+    //   }
+    // }
+    //
+    // if (strncmp(cmd, "rmv ", 4) == 0) {
+    //   int channel_id;
+    //   char slot_list[100];
+    //   if (sscanf(cmd + 4, "%d %s", &channel_id, slot_list) == 2) {
+    //     process_remove_command(channel_id, slot_list);
+    //   } else {
+    //     printf("Format: rmv <channel_id> <slot_list>\n");
+    //   }
+    // }
   }
   return 0;
 }

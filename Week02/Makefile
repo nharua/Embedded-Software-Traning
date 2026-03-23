@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
 TARGET = channel_app.out
-SRCS = main.c hw_model.c channel_manager.c
+SRCS = main.c hw_model.c channel_manager.c command_parser.c
 
 OBJS = $(SRCS:.c=.o)
 
