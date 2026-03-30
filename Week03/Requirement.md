@@ -1,0 +1,3 @@
+- Build and run Sudoku(7) game
+- Make a slide and present how it work.
+- Modify code for Generation a random puzzle each time.
