@@ -3,53 +3,67 @@
 #include <time.h>
 
 #define SIZE 9
-// Difficulty level: Adjust this value to increase or decrease the number of
-// empty cells in the generated puzzle. Higher means more empty cells, making
-// the puzzle harder.
-#define DIFICULTY_LEVEL 45
+#define DIFFICULTY_LEVEL 45
 
-// int puzzle[SIZE][9] = {
-//     // Sudoku puzzle to solve
-//     {3, 0, 0, 0, 2, 0, 0, 7, 0}, // 0 represents empty cells
-//     {SIZE, 0, 0, 5, 0, 0, 0, 1, 4}, // test with different inputs
-//     {0, 1, 6, 3, 7, 0, 0, 0, 8}, // Sudoku puzzle
-//     {2, 0, 0, 8, 0, 0, 0, 0, 1}, // fill in the zeros with the correct
-//     numbers {5, 0, 0, 0, 4, 1, 8, 0, 0}, // fill entire grid according to
-//     Sudoku rules {0, 8, SIZE, 0, 0, 0, 0, 5, 0}, // each number 1-9 must
-//     appear exactly once {0, 0, 5, 0, 1, 0, 2, 8, 0}, // in each row, column,
-//     and 3x3 subgrid {0, 4, 0, 0, 0, 6, 0, SIZE, 3}, // The backtracking
-//     algorithm {7, 3, 1, 0, 8, 2, 0, 0, 0},
-// };
+// ANSI Color Codes
+#define RED "\033[1;31m"
+#define RESET "\033[0m"
 
 int puzzle[SIZE][SIZE];
+int original[SIZE][SIZE]; // To store the "Question" state
 
-// Function prototypes
-void printPuzzle(int puzzle[SIZE][SIZE]);
-int validMove(int puzzle[SIZE][SIZE], int row, int col, int val);
-int solvePuzzle(int puzzle[SIZE][SIZE], int row, int col);
-void generatePuzzle(int puzzle[SIZE][SIZE], int numEmptyCells);
+void printPuzzle(int p[SIZE][SIZE], int isFinal);
+int validMove(int p[SIZE][SIZE], int row, int col, int val);
+int solvePuzzle(int p[SIZE][SIZE], int row, int col);
+void generatePuzzle(int p[SIZE][SIZE], int numEmptyCells);
 
 int main() {
-  srand(time(0)); // Seed the random number generator
-  printf("\n\tWelcome to SUDUKU Solver !!!\n");
+  srand(time(0));
+  printf("\n\tWelcome to SUDOKU Solver & Generator !!!\n");
 
-  // Step 1: Generate a random Sudoku Puzzle
-  // You can adjust the number of empty cells to make the puzzle easier or
-  // harder
-  int numEmptyCells = DIFICULTY_LEVEL; // Adjust this value for difficulty,
-                                       // higher means more empty cells
-  generatePuzzle(puzzle, numEmptyCells);
+  generatePuzzle(puzzle, DIFFICULTY_LEVEL);
 
-  printf("\n\nOriginal Puzzle:\n");
-  printPuzzle(puzzle);
+  // Backup the puzzle to distinguish original vs solved cells
+  for (int i = 0; i < SIZE; i++)
+    for (int j = 0; j < SIZE; j++)
+      original[i][j] = puzzle[i][j];
+
+  printf("\nOriginal Puzzle (Generated):\n");
+  printPuzzle(puzzle, 0); // 0 means this is the question
 
   if (solvePuzzle(puzzle, 0, 0)) {
-    printf("\n The puzzle is solved: \n");
-    printPuzzle(puzzle);
+    printf("\nSolution Found (New numbers in " RED "RED" RESET "):\n");
+    printPuzzle(puzzle, 1); // 1 means this is the final solution
   } else {
-    printf("\n No solution exists for the given puzzle.\n");
+    printf("\nNo solution exists.\n");
   }
   return 0;
+}
+
+void printPuzzle(int p[SIZE][SIZE], int isFinal) {
+  printf("\n+-------+-------+-------+");
+  for (int row = 0; row < SIZE; row++) {
+    if (row % 3 == 0 && row != 0)
+      printf("\n+-------+-------+-------+");
+    printf("\n");
+    for (int col = 0; col < SIZE; col++) {
+      if (col % 3 == 0)
+        printf("| ");
+
+      if (p[row][col] != 0) {
+        // If it's the final result and the cell was originally empty, print RED
+        if (isFinal && original[row][col] == 0) {
+          printf(RED "%d " RESET, p[row][col]);
+        } else {
+          printf("%d ", p[row][col]);
+        }
+      } else {
+        printf(". "); // Use dot for better visibility
+      }
+    }
+    printf("|");
+  }
+  printf("\n+-------+-------+-------+\n");
 }
 
 // Function to generate a random Sudoku puzzle
@@ -85,29 +99,6 @@ void generatePuzzle(int puzzle[SIZE][SIZE], int numEmptyCells) {
     else
       i--; // Repeat if the cell was already empty
   }
-}
-
-// Function to print the Sudoku puzzle
-void printPuzzle(int puzzle[SIZE][SIZE]) {
-  printf("\n+-------+-------+-------+");
-  for (int row = 0; row < SIZE; row++) {
-    if (row % 3 == 0 && row != 0) {
-      printf("\n+-------+-------+-------+");
-    }
-    printf("\n");
-    for (int col = 0; col < SIZE; col++) {
-      if (col % 3 == 0) {
-        printf("| ");
-      }
-      if (puzzle[row][col] != 0) {
-        printf("%d ", puzzle[row][col]);
-      } else {
-        printf("  ");
-      }
-    }
-    printf("|");
-  }
-  printf("\n+-------+-------+-------+\n");
 }
 
 int validMove(int puzzle[SIZE][SIZE], int row, int col, int val) {
