@@ -42,6 +42,7 @@ int main() {
 
   printf("\n\nOriginal Puzzle:\n");
   printPuzzle(puzzle);
+
   if (solvePuzzle(puzzle, 0, 0)) {
     printf("\n The puzzle is solved: \n");
     printPuzzle(puzzle);
@@ -137,7 +138,7 @@ int validMove(int puzzle[SIZE][SIZE], int row, int col, int val) {
 
 int solvePuzzle(int puzzle[SIZE][SIZE], int row, int col) {
   if (col == SIZE) {
-    if (row == 8) {
+    if (row == SIZE - 1) {
       return 1; // Puzzle solved
     }
     row++;
