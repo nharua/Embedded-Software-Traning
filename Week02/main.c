@@ -1,4 +1,3 @@
-#include "channel_manager.h"
 #include "command_parser.h"
 #include "hw_model.h"
 #include <stdint.h>

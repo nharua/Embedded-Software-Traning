@@ -1,7 +1,6 @@
 #include "channel_manager.h"
 #include "hw_model.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 /**
@@ -307,7 +306,6 @@ void process_show_command(char *channel_list) {
     return;
   }
 
-
   if (strncmp(channel_list, "rdwr", 4) == 0) {
     int handled = 0;
     // check rd status
@@ -369,7 +367,8 @@ void process_show_command(char *channel_list) {
       int match_single = sscanf(token, " %d %c", &ch, &extra);
       if (match_single == 1) {
         if (ch < 1 || ch > MAX_CHANNELS) {
-          printf("Error: Invalid channel ID %d. Must be between 1 and %d.\n", ch, MAX_CHANNELS);
+          printf("Error: Invalid channel ID %d. Must be between 1 and %d.\n",
+                 ch, MAX_CHANNELS);
           parse_error = 1;
           break;
         }
